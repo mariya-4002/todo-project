@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'apiapp',
+    'todolist',
 ]
 
 MIDDLEWARE = [
@@ -117,6 +118,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+APPEND_SLASH = True
+
 
 
 # Static files (CSS, JavaScript, Images)
