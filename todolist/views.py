@@ -1,57 +1,39 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
-
-from . import control
 from .models import Todo
 
-
-@api_view(['POST'])
-def create_todo(request):
-    todo_data = control.parse_create_request(request.data)
+def create_in_db(data):
     todo = Todo.objects.create(
-        title=todo_data.title,
-        description=todo_data.description
+        title=data.title,
+        description=data.description
     )
-    return Response({"message": "Todo created", "id": todo.id})
+    return {"id": todo.id, "message": "Todo created"}
 
-
-@api_view(['GET'])
-def get_all_todos(request):
-    todos = Todo.objects.all().values()
-    return Response(list(todos))
-
-
-@api_view(['GET'])
-def get_todo(request, todo_id):
+def update_in_db(todo_id, data):
     try:
         todo = Todo.objects.get(id=todo_id)
-        return Response({"id": todo.id, "title": todo.title, "description": todo.description})
+        todo.title = data.title
+        todo.description = data.description
+        todo.save()
+        return {"message": "Todo updated"}
     except Todo.DoesNotExist:
-        return Response({"error": "Todo not found"}, status=status.HTTP_404_NOT_FOUND)
+        return {"error": "Todo not found"}
 
-
-@api_view(['PUT'])
-def update_todo(request, todo_id):
+def get_from_db(todo_id):
     try:
         todo = Todo.objects.get(id=todo_id)
+        return {
+            "id": todo.id,
+            "title": todo.title,
+            "description": todo.description
+        }
     except Todo.DoesNotExist:
-        return Response({"error": "Todo not found"}, status=status.HTTP_404_NOT_FOUND)
+        return {"error": "Todo not found"}
 
-    todo_data = control.parse_update_request(request.data)
+def get_all_from_db():
+    return list(Todo.objects.all().values())
 
-    todo.title = todo_data.title
-    todo.description = todo_data.description
-    todo.save()
-
-    return Response({"message": "Todo updated"})
-
-
-@api_view(['DELETE'])
-def delete_todo(request, todo_id):
+def delete_from_db(todo_id):
     try:
-        todo = Todo.objects.get(id=todo_id)
-        todo.delete()
-        return Response({"message": "Todo deleted"})
+        Todo.objects.get(id=todo_id).delete()
+        return {"message": "Todo deleted"}
     except Todo.DoesNotExist:
-        return Response({"error": "Todo not found"}, status=status.HTTP_404_NOT_FOUND)
+        return {"error": "Todo not found"}

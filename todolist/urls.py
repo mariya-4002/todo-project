@@ -1,10 +1,10 @@
 from django.urls import path
-from . import views
+from . import control
 
 urlpatterns = [
-    path('add/', views.create_todo),
-    path('all/', views.get_all_todos),
-    path('<int:todo_id>/', views.get_todo),
-    path('update/<int:todo_id>/', views.update_todo),
-    path('delete/<int:todo_id>/', views.delete_todo),
+    path('create/', control.create_api),
+    path('update/<int:id>/', control.update_api),
+    path('get/<int:id>/', control.get_api),
+    path('all/', control.get_all_api),
+    path('delete/<int:id>/', control.delete_api),
 ]
