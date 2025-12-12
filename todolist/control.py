@@ -1,23 +1,17 @@
-from .models import Todo
+from .serializers import TodoRequestSerializer, TodoIdSerializer
+from .dataclass import TodoData
 
-def create_todo(title, description):
-    todo = Todo.objects.create(title=title, description=description)
-    return todo
+def parse_create_request(data):
+    serializer = TodoRequestSerializer(data=data)
+    serializer.is_valid(raise_exception=True)
+    return TodoData(**serializer.validated_data)
 
-def fetch_all_todos():
-    return Todo.objects.all()
+def parse_update_request(data):
+    serializer = TodoRequestSerializer(data=data)
+    serializer.is_valid(raise_exception=True)
+    return TodoData(**serializer.validated_data)
 
-def fetch_one_todo(id):
-    return Todo.objects.get(id=id)
-
-def update_todo_item(id, title, description):
-    todo = Todo.objects.get(id=id)
-    todo.title = title
-    todo.description = description
-    todo.save()
-    return todo
-
-def delete_todo_item(id):
-    todo = Todo.objects.get(id=id)
-    todo.delete()
-    return True
+def parse_id_request(data):
+    serializer = TodoIdSerializer(data=data)
+    serializer.is_valid(raise_exception=True)
+    return serializer.validated_data['id']

@@ -2,83 +2,56 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from .control import (
-    create_todo,
-    fetch_all_todos,
-    fetch_one_todo,
-    update_todo_item,
-    delete_todo_item
-)
-
-from .serializers import (
-    TodoCreateRequestSerializer,
-    TodoUpdateRequestSerializer,
-    TodoResponseSerializer,
-)
-
-from .dataclass import TodoDataClass
+from . import control
+from .models import Todo
 
 
-def convert_to_dataclass(todo_obj):
-    return TodoDataClass(
-        id=todo_obj.id,
-        title=todo_obj.title,
-        description=todo_obj.description,
-        created_at=str(todo_obj.created_at)
+@api_view(['POST'])
+def create_todo(request):
+    todo_data = control.parse_create_request(request.data)
+    todo = Todo.objects.create(
+        title=todo_data.title,
+        description=todo_data.description
     )
+    return Response({"message": "Todo created", "id": todo.id})
 
 
-@api_view(["POST"])
-def add_todo(request):
-    serializer = TodoCreateRequestSerializer(data=request.data)
-
-    if serializer.is_valid():
-        data = serializer.validated_data
-
-        todo = create_todo(data["title"], data["description"])
-
-        dc = convert_to_dataclass(todo)
-        response = TodoResponseSerializer(dc.__dict__)
-
-        return Response(response.data, status=status.HTTP_201_CREATED)
-
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-@api_view(["GET"])
+@api_view(['GET'])
 def get_all_todos(request):
-    todos = fetch_all_todos()
-    result = [TodoResponseSerializer(convert_to_dataclass(t).__dict__).data for t in todos]
-    return Response(result)
+    todos = Todo.objects.all().values()
+    return Response(list(todos))
 
 
-
-@api_view(["GET"])
-def get_todo(request, id):
-    todo = fetch_one_todo(id)
-    dc = convert_to_dataclass(todo)
-    return Response(TodoResponseSerializer(dc.__dict__).data)
-
-
-
-@api_view(["PUT"])
-def update_todo(request, id):
-    serializer = TodoUpdateRequestSerializer(data=request.data)
-
-    if serializer.is_valid():
-        data = serializer.validated_data
-
-        todo = update_todo_item(id, data["title"], data["description"])
-
-        dc = convert_to_dataclass(todo)
-        return Response(TodoResponseSerializer(dc.__dict__).data)
-
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET'])
+def get_todo(request, todo_id):
+    try:
+        todo = Todo.objects.get(id=todo_id)
+        return Response({"id": todo.id, "title": todo.title, "description": todo.description})
+    except Todo.DoesNotExist:
+        return Response({"error": "Todo not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['PUT'])
+def update_todo(request, todo_id):
+    try:
+        todo = Todo.objects.get(id=todo_id)
+    except Todo.DoesNotExist:
+        return Response({"error": "Todo not found"}, status=status.HTTP_404_NOT_FOUND)
 
-@api_view(["DELETE"])
-def delete_todo(request, id):
-    delete_todo_item(id)
-    return Response({"message": "Todo deleted successfully"})
+    todo_data = control.parse_update_request(request.data)
+
+    todo.title = todo_data.title
+    todo.description = todo_data.description
+    todo.save()
+
+    return Response({"message": "Todo updated"})
+
+
+@api_view(['DELETE'])
+def delete_todo(request, todo_id):
+    try:
+        todo = Todo.objects.get(id=todo_id)
+        todo.delete()
+        return Response({"message": "Todo deleted"})
+    except Todo.DoesNotExist:
+        return Response({"error": "Todo not found"}, status=status.HTTP_404_NOT_FOUND)
