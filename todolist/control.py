@@ -1,27 +1,23 @@
 from .models import Todo
 
-# GET all todos
-def get_all():
+def create_todo(title, description):
+    todo = Todo.objects.create(title=title, description=description)
+    return todo
+
+def fetch_all_todos():
     return Todo.objects.all()
 
-# GET one todo
-def get_one(todo_id):
-    return Todo.objects.get(id=todo_id)
+def fetch_one_todo(id):
+    return Todo.objects.get(id=id)
 
-# CREATE
-def create(title, description):
-    return Todo.objects.create(title=title, description=description)
-
-# UPDATE
-def update(todo_id, title, description):
-    todo = Todo.objects.get(id=todo_id)
+def update_todo_item(id, title, description):
+    todo = Todo.objects.get(id=id)
     todo.title = title
     todo.description = description
     todo.save()
     return todo
 
-# DELETE
-def delete(todo_id):
-    todo = Todo.objects.get(id=todo_id)
+def delete_todo_item(id):
+    todo = Todo.objects.get(id=id)
     todo.delete()
     return True

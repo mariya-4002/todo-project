@@ -1,55 +1,84 @@
-from django.http import JsonResponse
-from .models import Todo
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 
-# Get all todos
-def get_all_todos(request):
-    todos = list(Todo.objects.values())
-    return JsonResponse(todos, safe=False)
+from .control import (
+    create_todo,
+    fetch_all_todos,
+    fetch_one_todo,
+    update_todo_item,
+    delete_todo_item
+)
 
-# Get single todo by id
-def get_todo(request, id):
-    try:
-        todo = Todo.objects.get(id=id)
-        return JsonResponse({
-            "id": todo.id,
-            "title": todo.title,
-            "description": todo.description
-        })
-    except Todo.DoesNotExist:
-        return JsonResponse({"error": "Todo not found"}, status=404)
+from .serializers import (
+    TodoCreateRequestSerializer,
+    TodoUpdateRequestSerializer,
+    TodoResponseSerializer,
+)
 
-# Create todo
-from django.views.decorators.csrf import csrf_exempt
-import json
+from .dataclass import TodoDataClass
 
-@csrf_exempt
-def add_todo(request):
-    data = json.loads(request.body)
-    todo = Todo.objects.create(
-        title=data["title"],
-        description=data["description"]
+
+def convert_to_dataclass(todo_obj):
+    return TodoDataClass(
+        id=todo_obj.id,
+        title=todo_obj.title,
+        description=todo_obj.description,
+        created_at=str(todo_obj.created_at)
     )
-    return JsonResponse({"message": "Todo added", "id": todo.id})
 
-# Update todo
-@csrf_exempt
+
+@api_view(["POST"])
+def add_todo(request):
+    serializer = TodoCreateRequestSerializer(data=request.data)
+
+    if serializer.is_valid():
+        data = serializer.validated_data
+
+        todo = create_todo(data["title"], data["description"])
+
+        dc = convert_to_dataclass(todo)
+        response = TodoResponseSerializer(dc.__dict__)
+
+        return Response(response.data, status=status.HTTP_201_CREATED)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(["GET"])
+def get_all_todos(request):
+    todos = fetch_all_todos()
+    result = [TodoResponseSerializer(convert_to_dataclass(t).__dict__).data for t in todos]
+    return Response(result)
+
+
+
+@api_view(["GET"])
+def get_todo(request, id):
+    todo = fetch_one_todo(id)
+    dc = convert_to_dataclass(todo)
+    return Response(TodoResponseSerializer(dc.__dict__).data)
+
+
+
+@api_view(["PUT"])
 def update_todo(request, id):
-    data = json.loads(request.body)
-    try:
-        todo = Todo.objects.get(id=id)
-        todo.title = data["title"]
-        todo.description = data["description"]
-        todo.save()
-        return JsonResponse({"message": "Todo updated"})
-    except Todo.DoesNotExist:
-        return JsonResponse({"error": "Todo not found"}, status=404)
+    serializer = TodoUpdateRequestSerializer(data=request.data)
 
-# Delete todo
-@csrf_exempt
+    if serializer.is_valid():
+        data = serializer.validated_data
+
+        todo = update_todo_item(id, data["title"], data["description"])
+
+        dc = convert_to_dataclass(todo)
+        return Response(TodoResponseSerializer(dc.__dict__).data)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(["DELETE"])
 def delete_todo(request, id):
-    try:
-        todo = Todo.objects.get(id=id)
-        todo.delete()
-        return JsonResponse({"message": "Todo deleted"})
-    except Todo.DoesNotExist:
-        return JsonResponse({"error": "Todo not found"}, status=404)
+    delete_todo_item(id)
+    return Response({"message": "Todo deleted successfully"})

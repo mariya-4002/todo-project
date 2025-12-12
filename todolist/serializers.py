@@ -1,7 +1,15 @@
 from rest_framework import serializers
-from .models import Todo
 
-class TodoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Todo
-        fields = '__all__'
+class TodoCreateRequestSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    description = serializers.CharField()
+
+class TodoUpdateRequestSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    description = serializers.CharField()
+
+class TodoResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField()
+    description = serializers.CharField()
+    created_at = serializers.CharField()
