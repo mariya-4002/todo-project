@@ -126,10 +126,12 @@ def get_all_api(request):
     )
 
 
+
 # -------------------- DELETE --------------------
 @api_view(['DELETE'])
 def delete_api(request):
-    todo_id = request.data.get("id")
+    # DELETE → read from query params first
+    todo_id = request.query_params.get("id") or request.data.get("id")
 
     if not todo_id:
         return error_response(
@@ -148,3 +150,4 @@ def delete_api(request):
     return success_response(
         message="Todo deleted successfully"
     )
+

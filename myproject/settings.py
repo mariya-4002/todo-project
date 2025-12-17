@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'apiapp',
     'feature.todolist',
+    'feature.music',
 
 ]
 
