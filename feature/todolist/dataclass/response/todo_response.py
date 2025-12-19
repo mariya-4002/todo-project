@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 @dataclass
-class MusicData:
+class TodoResponse:
+    id: int
     title: str
-    artist: str
+    description: str

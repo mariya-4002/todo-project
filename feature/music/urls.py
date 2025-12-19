@@ -1,16 +1,10 @@
 from django.urls import path
-from .control import (
-    create_music,
-    update_music,
-    get_music,
-    get_all_music,
-    delete_music
-)
+from . import controller
 
 urlpatterns = [
-    path('create/', create_music),
-    path('update/', update_music),      # ❌ removed <int:music_id>
-    path('get/', get_music),            # ❌ removed <int:music_id>
-    path('all/', get_all_music),
-    path('delete/', delete_music),      # ❌ removed <int:music_id>
+    path('create/', controller.create_music),   # POST
+    path('update/', controller.update_music),   # PUT
+    path('get/', controller.get_music),         # GET (single)
+    path('all/', controller.get_all_music),     # GET (all)
+    path('delete/', controller.delete_music),   # DELETE
 ]
