@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 
-from .util.response import success_response, error_response
 
 
 class Todo(models.Model):

@@ -1,63 +1,43 @@
-from .models import Music
+from rest_framework import status
+from feature.common.response import success_response
 
 
-def create_in_db(data):
-    music = Music.objects.create(
-        title=data.title,
-        artist=data.artist
+def music_created_response(music):
+    return success_response(
+        message="Music created successfully",
+        data={
+            "id": music.id,
+            "title": music.title,
+            "artist": music.artist
+        },
+        status_code=status.HTTP_201_CREATED
     )
-    return {
-        "id": music.id,
-        "message": "Music created"
-    }
 
 
-def update_in_db(music_id, data):
-    try:
-        music = Music.objects.get(id=music_id)
-        music.title = data.title
-        music.artist = data.artist
-        music.save()
-        return {
-            "message": "Music updated"
-        }
-    except Music.DoesNotExist:
-        return {
-            "error": "Music not found"
-        }
-
-
-def get_from_db(music_id):
-    try:
-        music = Music.objects.get(id=music_id)
-        return {
+def music_updated_response(music):
+    return success_response(
+        message="Music updated successfully",
+        data={
             "id": music.id,
             "title": music.title,
             "artist": music.artist
         }
-    except Music.DoesNotExist:
-        return {
-            "error": "Music not found"
-        }
-
-
-def get_all_from_db():
-    return list(
-        Music.objects.all().values(
-            "id",
-            "title",
-            "artist"
-        )
     )
 
 
-def delete_from_db(music_id):
-    try:
-        Music.objects.get(id=music_id).delete()
-        return {
-            "message": "Music deleted"
+def music_fetched_response(music):
+    return success_response(
+        data={
+            "id": music.id,
+            "title": music.title,
+            "artist": music.artist
         }
-    except Music.DoesNotExist:
-        return {
-            "error": "Music not found"
-        }
+    )
+
+
+def music_list_response(data):
+    return success_response(data=data)
+
+
+def music_deleted_response():
+    return success_response(message="Music deleted successfully")

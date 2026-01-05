@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'apiapp',
     'feature.todolist',
     'feature.music',
+    'feature.artist',
 
 ]
 
