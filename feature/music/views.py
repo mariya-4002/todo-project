@@ -8,7 +8,10 @@ def music_created_response(music):
         data={
             "id": music.id,
             "title": music.title,
-            "artist": music.artist
+            "artist": {
+                "id": music.artist.id,
+                "name": music.artist.name
+            }
         },
         status_code=status.HTTP_201_CREATED
     )
@@ -20,7 +23,10 @@ def music_updated_response(music):
         data={
             "id": music.id,
             "title": music.title,
-            "artist": music.artist
+            "artist": {
+                "id": music.artist.id,
+                "name": music.artist.name
+            }
         }
     )
 
@@ -30,7 +36,10 @@ def music_fetched_response(music):
         data={
             "id": music.id,
             "title": music.title,
-            "artist": music.artist
+            "artist": {
+                "id": music.artist.id,
+                "name": music.artist.name
+            }
         }
     )
 

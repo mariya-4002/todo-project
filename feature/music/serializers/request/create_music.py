@@ -1,15 +1,12 @@
 from rest_framework import serializers
+from feature.artist.models import Artist
+
 
 class CreateMusicRequestSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=100)
-    artist = serializers.CharField(max_length=100)
+    artist_id = serializers.IntegerField()
 
-    def validate_title(self, value):
-        if len(value.strip()) < 2:
-            raise serializers.ValidationError("Title must have at least 2 characters")
-        return value
-
-    def validate_artist(self, value):
-        if len(value.strip()) < 2:
-            raise serializers.ValidationError("Artist must have at least 2 characters")
+    def validate_artist_id(self, value):
+        if not Artist.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Artist not found")
         return value

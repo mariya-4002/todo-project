@@ -56,7 +56,6 @@ def get_music(request):
     return views.music_fetched_response(music)
 
 
-# ✅ FIXED GET ALL WITH PAGE + LIMIT
 @api_view(['GET'])
 def get_all_music(request):
     serializer = GetAllMusicRequestSerializer(data=request.query_params)
@@ -68,19 +67,22 @@ def get_all_music(request):
     limit = serializer.validated_data["limit"]
 
     queryset = Music.get_all_music()
-
     paginated = paginate_queryset(queryset, page=page, limit=limit)
 
     paginated["results"] = [
         {
             "id": m.id,
             "title": m.title,
-            "artist": m.artist
+            "artist": {
+                "id": m.artist.id,
+                "name": m.artist.name
+            }
         }
         for m in paginated["results"]
     ]
 
     return views.music_list_response(paginated)
+
 
 
 @api_view(['DELETE'])
