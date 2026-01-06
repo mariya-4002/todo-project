@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'feature.todolist',
     'feature.music',
     'feature.artist',
-
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [

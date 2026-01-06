@@ -1,10 +1,9 @@
 from rest_framework.decorators import api_view
-from .models import Todo
+from drf_yasg.utils import swagger_auto_schema
 
+from .models import Todo
 from feature.common.response import success_response, error_400, error_404
 from feature.common.pagination import paginate_queryset
-
-
 
 from .serializers.request.create_todo import CreateTodoRequestSerializer
 from .serializers.request.update_todo import UpdateTodoRequestSerializer
@@ -13,7 +12,7 @@ from .serializers.request.get_all_todo import GetAllTodoRequestSerializer
 from .serializers.request.delete_todo import DeleteTodoRequestSerializer
 
 
-
+@swagger_auto_schema(method='post', request_body=CreateTodoRequestSerializer)
 @api_view(['POST'])
 def create_todo(request):
     serializer = CreateTodoRequestSerializer(data=request.data)
@@ -34,6 +33,7 @@ def create_todo(request):
     )
 
 
+@swagger_auto_schema(method='put', request_body=UpdateTodoRequestSerializer)
 @api_view(['PUT'])
 def update_todo(request):
     serializer = UpdateTodoRequestSerializer(data=request.data)
@@ -59,6 +59,7 @@ def update_todo(request):
     )
 
 
+@swagger_auto_schema(method='get', query_serializer=GetTodoRequestSerializer)
 @api_view(['GET'])
 def get_todo(request):
     serializer = GetTodoRequestSerializer(data=request.query_params)
@@ -80,6 +81,7 @@ def get_todo(request):
     )
 
 
+@swagger_auto_schema(method='get', query_serializer=GetAllTodoRequestSerializer)
 @api_view(['GET'])
 def get_all_todo(request):
     serializer = GetAllTodoRequestSerializer(data=request.query_params)
@@ -108,7 +110,7 @@ def get_all_todo(request):
     return success_response(data=paginated)
 
 
-
+@swagger_auto_schema(method='delete', query_serializer=DeleteTodoRequestSerializer)
 @api_view(['DELETE'])
 def delete_todo(request):
     serializer = DeleteTodoRequestSerializer(

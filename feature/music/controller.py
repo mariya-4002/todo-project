@@ -1,4 +1,6 @@
 from rest_framework.decorators import api_view
+from drf_yasg.utils import swagger_auto_schema
+
 from .models import Music
 from . import views
 
@@ -12,6 +14,7 @@ from .serializers.request.get_all_music import GetAllMusicRequestSerializer
 from .serializers.request.delete_music import DeleteMusicRequestSerializer
 
 
+@swagger_auto_schema(method='post', request_body=CreateMusicRequestSerializer)
 @api_view(['POST'])
 def create_music(request):
     serializer = CreateMusicRequestSerializer(data=request.data)
@@ -23,6 +26,7 @@ def create_music(request):
     return views.music_created_response(music)
 
 
+@swagger_auto_schema(method='put', request_body=UpdateMusicRequestSerializer)
 @api_view(['PUT'])
 def update_music(request):
     serializer = UpdateMusicRequestSerializer(data=request.data)
@@ -41,6 +45,7 @@ def update_music(request):
     return views.music_updated_response(music)
 
 
+@swagger_auto_schema(method='get', query_serializer=GetMusicRequestSerializer)
 @api_view(['GET'])
 def get_music(request):
     serializer = GetMusicRequestSerializer(data=request.query_params)
@@ -56,6 +61,7 @@ def get_music(request):
     return views.music_fetched_response(music)
 
 
+@swagger_auto_schema(method='get', query_serializer=GetAllMusicRequestSerializer)
 @api_view(['GET'])
 def get_all_music(request):
     serializer = GetAllMusicRequestSerializer(data=request.query_params)
@@ -84,7 +90,7 @@ def get_all_music(request):
     return views.music_list_response(paginated)
 
 
-
+@swagger_auto_schema(method='delete', query_serializer=DeleteMusicRequestSerializer)
 @api_view(['DELETE'])
 def delete_music(request):
     serializer = DeleteMusicRequestSerializer(

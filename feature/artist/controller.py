@@ -1,4 +1,6 @@
 from rest_framework.decorators import api_view
+from drf_yasg.utils import swagger_auto_schema
+
 from feature.common.response import error_400, error_404
 from feature.common.pagination import paginate_queryset
 
@@ -12,6 +14,7 @@ from .serializers.request.get_all_artist import GetAllArtistRequestSerializer
 from .serializers.request.delete_artist import DeleteArtistRequestSerializer
 
 
+@swagger_auto_schema(method='post', request_body=CreateArtistRequestSerializer)
 @api_view(['POST'])
 def create_artist(request):
     serializer = CreateArtistRequestSerializer(data=request.data)
@@ -22,6 +25,7 @@ def create_artist(request):
     return views.artist_created_response(artist)
 
 
+@swagger_auto_schema(method='put', request_body=UpdateArtistRequestSerializer)
 @api_view(['PUT'])
 def update_artist(request):
     serializer = UpdateArtistRequestSerializer(data=request.data)
@@ -39,6 +43,7 @@ def update_artist(request):
     return views.artist_updated_response(artist)
 
 
+@swagger_auto_schema(method='get', query_serializer=GetArtistRequestSerializer)
 @api_view(['GET'])
 def get_artist(request):
     serializer = GetArtistRequestSerializer(data=request.query_params)
@@ -52,6 +57,7 @@ def get_artist(request):
     return views.artist_fetched_response(artist)
 
 
+@swagger_auto_schema(method='get', query_serializer=GetAllArtistRequestSerializer)
 @api_view(['GET'])
 def get_all_artist(request):
     serializer = GetAllArtistRequestSerializer(data=request.query_params)
@@ -76,6 +82,7 @@ def get_all_artist(request):
     return views.artist_list_response(paginated)
 
 
+@swagger_auto_schema(method='delete', query_serializer=DeleteArtistRequestSerializer)
 @api_view(['DELETE'])
 def delete_artist(request):
     serializer = DeleteArtistRequestSerializer(
